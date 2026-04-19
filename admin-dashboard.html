@@ -1,0 +1,987 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Admin Dashboard - LifeLink Blood Bank</title>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    background: #f4f6f9;
+    min-height: 100vh;
+  }
+
+  /* ---- SIDEBAR ---- */
+  #sidebar {
+    width: 260px;
+    min-height: 100vh;
+    background: #1a1a2e;
+    position: fixed;
+    top: 0; left: 0;
+    z-index: 1000;
+    transition: transform 0.3s;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .sidebar-brand {
+    background: #dc3545;
+    padding: 20px 24px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .sidebar-brand img {
+    width: 40px;
+    border-radius: 50%;
+  }
+
+  .sidebar-brand span {
+    color: white;
+    font-size: 1.2rem;
+    font-weight: 700;
+  }
+
+  .sidebar-brand small {
+    color: rgba(255,255,255,0.7);
+    font-size: 11px;
+    display: block;
+    margin-top: 2px;
+  }
+
+  .sidebar-menu {
+    padding: 20px 0;
+    flex: 1;
+  }
+
+  .sidebar-section-title {
+    color: rgba(255,255,255,0.35);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    padding: 12px 24px 6px;
+  }
+
+  .sidebar-link {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 24px;
+    color: rgba(255,255,255,0.7);
+    text-decoration: none;
+    font-size: 14.5px;
+    font-weight: 500;
+    transition: all 0.2s;
+    border-left: 3px solid transparent;
+    cursor: pointer;
+  }
+
+  .sidebar-link:hover, .sidebar-link.active {
+    color: white;
+    background: rgba(220, 53, 69, 0.2);
+    border-left-color: #dc3545;
+  }
+
+  .sidebar-link i {
+    font-size: 18px;
+    width: 22px;
+    text-align: center;
+  }
+
+  .sidebar-badge {
+    margin-left: auto;
+    background: #dc3545;
+    color: white;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 50px;
+  }
+
+  .sidebar-footer {
+    padding: 16px 24px;
+    border-top: 1px solid rgba(255,255,255,0.08);
+  }
+
+  .sidebar-footer .admin-info {
+    color: rgba(255,255,255,0.6);
+    font-size: 13px;
+  }
+
+  .sidebar-footer .admin-name {
+    color: white;
+    font-weight: 600;
+    font-size: 14px;
+  }
+
+  /* ---- MAIN CONTENT ---- */
+  #mainContent {
+    margin-left: 260px;
+    min-height: 100vh;
+    transition: margin-left 0.3s;
+  }
+
+  /* ---- TOP NAV ---- */
+  .top-navbar {
+    background: white;
+    border-bottom: 1px solid #e8e8e8;
+    padding: 14px 28px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 999;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+  }
+
+  .top-navbar .page-title {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #333;
+  }
+
+  .top-navbar .breadcrumb {
+    font-size: 12px;
+    margin: 0;
+  }
+
+  .top-actions {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .top-actions .notification-btn {
+    position: relative;
+    background: none;
+    border: none;
+    font-size: 1.3rem;
+    color: #666;
+    cursor: pointer;
+  }
+
+  .top-actions .notification-btn .dot {
+    position: absolute;
+    top: 2px; right: 2px;
+    width: 8px; height: 8px;
+    background: #dc3545;
+    border-radius: 50%;
+  }
+
+  .admin-avatar {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    background: #dc3545;
+    color: white;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700;
+    font-size: 15px;
+    cursor: pointer;
+  }
+
+  /* ---- DASHBOARD CONTENT ---- */
+  .dashboard-content {
+    padding: 28px;
+  }
+
+  /* ---- STAT CARDS ---- */
+  .stat-card {
+    border: none;
+    border-radius: 14px;
+    box-shadow: 0 4px 18px rgba(0,0,0,0.07);
+    overflow: hidden;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+
+  .stat-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.12);
+  }
+
+  .stat-card .card-body {
+    padding: 24px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+  }
+
+  .stat-icon {
+    width: 60px; height: 60px;
+    border-radius: 14px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.7rem;
+    flex-shrink: 0;
+  }
+
+  .stat-number {
+    font-size: 2rem;
+    font-weight: 800;
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+
+  .stat-label {
+    color: #777;
+    font-size: 13.5px;
+    font-weight: 500;
+  }
+
+  .stat-change {
+    font-size: 12px;
+    font-weight: 600;
+    margin-top: 4px;
+  }
+
+  /* ---- SECTION CARDS ---- */
+  .section-card {
+    border: none;
+    border-radius: 14px;
+    box-shadow: 0 4px 18px rgba(0,0,0,0.07);
+    overflow: hidden;
+  }
+
+  .section-card .card-header {
+    background: white;
+    border-bottom: 1px solid #f0f0f0;
+    padding: 18px 22px;
+    font-weight: 700;
+    font-size: 15px;
+    color: #333;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .section-card .card-header i {
+    color: #dc3545;
+    font-size: 18px;
+    margin-right: 8px;
+  }
+
+  /* ---- TABLE ---- */
+  .table th {
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #999;
+    background: #fafafa;
+    border-top: none;
+  }
+
+  .table td {
+    vertical-align: middle;
+    font-size: 14px;
+    color: #444;
+  }
+
+  .blood-group-badge {
+    background: #dc3545;
+    color: white;
+    padding: 3px 10px;
+    border-radius: 50px;
+    font-size: 12px;
+    font-weight: 700;
+  }
+
+  .status-badge {
+    padding: 4px 12px;
+    border-radius: 50px;
+    font-size: 12px;
+    font-weight: 600;
+  }
+
+  /* ---- BLOOD STOCK ---- */
+  .blood-stock-item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 12px 0;
+    border-bottom: 1px solid #f5f5f5;
+  }
+
+  .blood-stock-item:last-child { border-bottom: none; }
+
+  .blood-type-circle {
+    width: 46px; height: 46px;
+    background: #dc3545;
+    color: white;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 800;
+    font-size: 13px;
+    flex-shrink: 0;
+  }
+
+  .blood-stock-info { flex: 1; }
+
+  .blood-stock-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 5px;
+  }
+
+  .progress { height: 8px; border-radius: 50px; background: #f0f0f0; }
+  .progress-bar { border-radius: 50px; }
+
+  .blood-units {
+    font-size: 13px;
+    font-weight: 700;
+    color: #555;
+    text-align: right;
+    min-width: 55px;
+  }
+
+  /* ---- SECTION TABS ---- */
+  .tab-section { display: none; }
+  .tab-section.active { display: block; }
+
+  /* ---- MOBILE ---- */
+  #sidebarToggle {
+    display: none;
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    color: #333;
+    cursor: pointer;
+    margin-right: 10px;
+  }
+
+  @media (max-width: 991px) {
+    #sidebar { transform: translateX(-260px); }
+    #sidebar.show { transform: translateX(0); }
+    #mainContent { margin-left: 0; }
+    #sidebarToggle { display: block; }
+  }
+
+  /* ---- LOGOUT CONFIRM ---- */
+  .overlay {
+    display: none;
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 2000;
+    align-items: center;
+    justify-content: center;
+  }
+  .overlay.show { display: flex; }
+
+  .confirm-box {
+    background: white;
+    border-radius: 16px;
+    padding: 36px;
+    text-align: center;
+    max-width: 360px;
+    width: 90%;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+  }
+</style>
+</head>
+<body>
+
+<!-- ======================== SIDEBAR ======================== -->
+<div id="sidebar">
+  <div class="sidebar-brand">
+    <img src="blood.jpg" alt="logo">
+    <div>
+      <span>LifeLink</span>
+      <small>Admin Panel</small>
+    </div>
+  </div>
+
+  <div class="sidebar-menu">
+    <div class="sidebar-section-title">Main</div>
+    <a class="sidebar-link active" onclick="showSection('dashboard')">
+      <i class="bi bi-speedometer2"></i> Dashboard
+    </a>
+
+    <div class="sidebar-section-title">Management</div>
+    <a class="sidebar-link" onclick="showSection('donors')">
+      <i class="bi bi-people-fill"></i> Registered Donors
+      <span class="sidebar-badge">75</span>
+    </a>
+    <a class="sidebar-link" onclick="showSection('requests')">
+      <i class="bi bi-droplet-fill"></i> Blood Requests
+      <span class="sidebar-badge">8</span>
+    </a>
+    <a class="sidebar-link" onclick="showSection('emergency')">
+      <i class="bi bi-exclamation-triangle-fill"></i> Emergency Requests
+      <span class="sidebar-badge">3</span>
+    </a>
+    <a class="sidebar-link" onclick="showSection('camps')">
+      <i class="bi bi-calendar-event-fill"></i> Donation Camps
+    </a>
+    <a class="sidebar-link" onclick="showSection('stock')">
+      <i class="bi bi-archive-fill"></i> Blood Stock
+    </a>
+
+    <div class="sidebar-section-title">System</div>
+    <a class="sidebar-link" onclick="showSection('contact')">
+      <i class="bi bi-envelope-fill"></i> Contact Messages
+      <span class="sidebar-badge">5</span>
+    </a>
+    <a class="sidebar-link" onclick="document.getElementById('logoutOverlay').classList.add('show')">
+      <i class="bi bi-box-arrow-right"></i> Logout
+    </a>
+  </div>
+
+  <div class="sidebar-footer">
+    <div class="admin-name"><i class="bi bi-shield-check me-1 text-danger"></i> Admin</div>
+    <div class="admin-info">lifelinkadmin@gmail.com</div>
+  </div>
+</div>
+
+<!-- ======================== MAIN CONTENT ======================== -->
+<div id="mainContent">
+
+  <!-- TOP NAVBAR -->
+  <div class="top-navbar">
+    <div class="d-flex align-items-center">
+      <button id="sidebarToggle" onclick="toggleSidebar()"><i class="bi bi-list"></i></button>
+      <div>
+        <div class="page-title" id="pageTitle">Dashboard Overview</div>
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb mb-0">
+            <li class="breadcrumb-item text-muted">LifeLink Admin</li>
+            <li class="breadcrumb-item active text-danger" id="breadcrumbCurrent">Dashboard</li>
+          </ol>
+        </nav>
+      </div>
+    </div>
+    <div class="top-actions">
+      <button class="notification-btn" title="Notifications">
+        <i class="bi bi-bell-fill"></i>
+        <span class="dot"></span>
+      </button>
+      <div class="admin-avatar" title="Admin">A</div>
+    </div>
+  </div>
+
+  <!-- DASHBOARD CONTENT -->
+  <div class="dashboard-content">
+
+    <!-- ======= DASHBOARD SECTION ======= -->
+    <div id="section-dashboard" class="tab-section active">
+
+      <!-- Stat Cards -->
+      <div class="row g-4 mb-4">
+        <div class="col-xl-3 col-md-6">
+          <div class="stat-card card">
+            <div class="card-body">
+              <div class="stat-icon" style="background:#fff0f1;">
+                <i class="bi bi-people-fill text-danger"></i>
+              </div>
+              <div>
+                <div class="stat-number text-danger">75</div>
+                <div class="stat-label">Registered Donors</div>
+                <div class="stat-change text-success"><i class="bi bi-arrow-up-short"></i>+12 this month</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6">
+          <div class="stat-card card">
+            <div class="card-body">
+              <div class="stat-icon" style="background:#fff0f1;">
+                <i class="bi bi-droplet-fill text-danger"></i>
+              </div>
+              <div>
+                <div class="stat-number text-danger">100+</div>
+                <div class="stat-label">Units Donated</div>
+                <div class="stat-change text-success"><i class="bi bi-arrow-up-short"></i>+18 this month</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6">
+          <div class="stat-card card">
+            <div class="card-body">
+              <div class="stat-icon" style="background:#fff0f1;">
+                <i class="bi bi-heart-pulse-fill text-danger"></i>
+              </div>
+              <div>
+                <div class="stat-number text-danger">40+</div>
+                <div class="stat-label">Patients Helped</div>
+                <div class="stat-change text-success"><i class="bi bi-arrow-up-short"></i>+5 this month</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6">
+          <div class="stat-card card">
+            <div class="card-body">
+              <div class="stat-icon" style="background:#fff0f1;">
+                <i class="bi bi-exclamation-triangle-fill text-danger"></i>
+              </div>
+              <div>
+                <div class="stat-number text-danger">3</div>
+                <div class="stat-label">Pending Emergencies</div>
+                <div class="stat-change text-danger"><i class="bi bi-exclamation-circle"></i> Needs attention</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recent Requests + Blood Stock -->
+      <div class="row g-4">
+        <div class="col-lg-7">
+          <div class="section-card card">
+            <div class="card-header">
+              <span><i class="bi bi-clock-history"></i>Recent Blood Requests</span>
+              <button class="btn btn-sm btn-outline-danger" onclick="showSection('requests')">View All</button>
+            </div>
+            <div class="card-body p-0">
+              <table class="table mb-0">
+                <thead>
+                  <tr>
+                    <th class="ps-3">#</th>
+                    <th>Patient</th>
+                    <th>Blood</th>
+                    <th>Units</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="ps-3">#001</td>
+                    <td>Ravi Kumar</td>
+                    <td><span class="blood-group-badge">A+</span></td>
+                    <td>2</td>
+                    <td><span class="status-badge bg-success text-white">Fulfilled</span></td>
+                  </tr>
+                  <tr>
+                    <td class="ps-3">#002</td>
+                    <td>Priya Sharma</td>
+                    <td><span class="blood-group-badge">O-</span></td>
+                    <td>1</td>
+                    <td><span class="status-badge bg-warning text-dark">Pending</span></td>
+                  </tr>
+                  <tr>
+                    <td class="ps-3">#003</td>
+                    <td>Arun Vel</td>
+                    <td><span class="blood-group-badge">B+</span></td>
+                    <td>3</td>
+                    <td><span class="status-badge bg-danger text-white">Emergency</span></td>
+                  </tr>
+                  <tr>
+                    <td class="ps-3">#004</td>
+                    <td>Meena Devi</td>
+                    <td><span class="blood-group-badge">AB+</span></td>
+                    <td>2</td>
+                    <td><span class="status-badge bg-success text-white">Fulfilled</span></td>
+                  </tr>
+                  <tr>
+                    <td class="ps-3">#005</td>
+                    <td>Suresh Raj</td>
+                    <td><span class="blood-group-badge">A-</span></td>
+                    <td>1</td>
+                    <td><span class="status-badge bg-secondary text-white">Processing</span></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-lg-5">
+          <div class="section-card card h-100">
+            <div class="card-header">
+              <span><i class="bi bi-archive-fill"></i>Blood Stock Overview</span>
+            </div>
+            <div class="card-body">
+              <div class="blood-stock-item">
+                <div class="blood-type-circle">A+</div>
+                <div class="blood-stock-info">
+                  <div class="blood-stock-label">A Positive</div>
+                  <div class="progress"><div class="progress-bar bg-danger" style="width:75%"></div></div>
+                </div>
+                <div class="blood-units">15 U</div>
+              </div>
+              <div class="blood-stock-item">
+                <div class="blood-type-circle">B+</div>
+                <div class="blood-stock-info">
+                  <div class="blood-stock-label">B Positive</div>
+                  <div class="progress"><div class="progress-bar bg-danger" style="width:55%"></div></div>
+                </div>
+                <div class="blood-units">11 U</div>
+              </div>
+              <div class="blood-stock-item">
+                <div class="blood-type-circle">O+</div>
+                <div class="blood-stock-info">
+                  <div class="blood-stock-label">O Positive</div>
+                  <div class="progress"><div class="progress-bar bg-success" style="width:90%"></div></div>
+                </div>
+                <div class="blood-units">18 U</div>
+              </div>
+              <div class="blood-stock-item">
+                <div class="blood-type-circle">AB+</div>
+                <div class="blood-stock-info">
+                  <div class="blood-stock-label">AB Positive</div>
+                  <div class="progress"><div class="progress-bar bg-warning" style="width:30%"></div></div>
+                </div>
+                <div class="blood-units">6 U</div>
+              </div>
+              <div class="blood-stock-item">
+                <div class="blood-type-circle">O-</div>
+                <div class="blood-stock-info">
+                  <div class="blood-stock-label">O Negative</div>
+                  <div class="progress"><div class="progress-bar bg-danger" style="width:20%"></div></div>
+                </div>
+                <div class="blood-units">4 U</div>
+              </div>
+              <div class="blood-stock-item">
+                <div class="blood-type-circle">A-</div>
+                <div class="blood-stock-info">
+                  <div class="blood-stock-label">A Negative</div>
+                  <div class="progress"><div class="progress-bar bg-warning" style="width:35%"></div></div>
+                </div>
+                <div class="blood-units">7 U</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ======= DONORS SECTION ======= -->
+    <div id="section-donors" class="tab-section">
+      <div class="section-card card">
+        <div class="card-header">
+          <span><i class="bi bi-people-fill"></i>Registered Donors</span>
+          <input type="text" class="form-control form-control-sm w-auto" placeholder="Search donor...">
+        </div>
+        <div class="card-body p-0">
+          <div class="table-responsive">
+            <table class="table mb-0 table-hover">
+              <thead>
+                <tr>
+                  <th class="ps-3">#</th>
+                  <th>Name</th>
+                  <th>Phone</th>
+                  <th>Blood Group</th>
+                  <th>Age</th>
+                  <th>City</th>
+                  <th>Status</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td class="ps-3">1</td><td>Ravi Kumar</td><td>9876543210</td><td><span class="blood-group-badge">A+</span></td><td>28</td><td>Chennai</td><td><span class="status-badge bg-success text-white">Active</span></td><td><button class="btn btn-sm btn-outline-danger">Remove</button></td></tr>
+                <tr><td class="ps-3">2</td><td>Priya Sharma</td><td>9123456780</td><td><span class="blood-group-badge">O-</span></td><td>32</td><td>Coimbatore</td><td><span class="status-badge bg-success text-white">Active</span></td><td><button class="btn btn-sm btn-outline-danger">Remove</button></td></tr>
+                <tr><td class="ps-3">3</td><td>Arun Vel</td><td>9988776655</td><td><span class="blood-group-badge">B+</span></td><td>24</td><td>Madurai</td><td><span class="status-badge bg-warning text-dark">Pending</span></td><td><button class="btn btn-sm btn-outline-danger">Remove</button></td></tr>
+                <tr><td class="ps-3">4</td><td>Meena Devi</td><td>9876001234</td><td><span class="blood-group-badge">AB+</span></td><td>45</td><td>Trichy</td><td><span class="status-badge bg-success text-white">Active</span></td><td><button class="btn btn-sm btn-outline-danger">Remove</button></td></tr>
+                <tr><td class="ps-3">5</td><td>Suresh Raj</td><td>9000112233</td><td><span class="blood-group-badge">A-</span></td><td>38</td><td>Salem</td><td><span class="status-badge bg-success text-white">Active</span></td><td><button class="btn btn-sm btn-outline-danger">Remove</button></td></tr>
+                <tr><td class="ps-3">6</td><td>Kavitha N</td><td>9876501234</td><td><span class="blood-group-badge">B-</span></td><td>29</td><td>Chennai</td><td><span class="status-badge bg-secondary text-white">Inactive</span></td><td><button class="btn btn-sm btn-outline-danger">Remove</button></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ======= BLOOD REQUESTS SECTION ======= -->
+    <div id="section-requests" class="tab-section">
+      <div class="section-card card">
+        <div class="card-header">
+          <span><i class="bi bi-droplet-fill"></i>All Blood Requests</span>
+        </div>
+        <div class="card-body p-0">
+          <div class="table-responsive">
+            <table class="table mb-0 table-hover">
+              <thead>
+                <tr>
+                  <th class="ps-3">Req ID</th>
+                  <th>Patient</th>
+                  <th>Blood</th>
+                  <th>Units</th>
+                  <th>Hospital</th>
+                  <th>City</th>
+                  <th>Date</th>
+                  <th>Urgency</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td class="ps-3">#001</td><td>Ravi Kumar</td><td><span class="blood-group-badge">A+</span></td><td>2</td><td>City Hospital</td><td>Chennai</td><td>22 Mar 2026</td><td><span class="badge bg-warning text-dark">Normal</span></td><td><span class="status-badge bg-success text-white">Fulfilled</span></td></tr>
+                <tr><td class="ps-3">#002</td><td>Priya Sharma</td><td><span class="blood-group-badge">O-</span></td><td>1</td><td>Apollo</td><td>Coimbatore</td><td>21 Mar 2026</td><td><span class="badge bg-danger text-white">Emergency</span></td><td><span class="status-badge bg-warning text-dark">Pending</span></td></tr>
+                <tr><td class="ps-3">#003</td><td>Arun Vel</td><td><span class="blood-group-badge">B+</span></td><td>3</td><td>Govt Hospital</td><td>Madurai</td><td>22 Mar 2026</td><td><span class="badge bg-danger text-white">Emergency</span></td><td><span class="status-badge bg-danger text-white">Emergency</span></td></tr>
+                <tr><td class="ps-3">#004</td><td>Meena Devi</td><td><span class="blood-group-badge">AB+</span></td><td>2</td><td>KMC Hospital</td><td>Trichy</td><td>20 Mar 2026</td><td><span class="badge bg-warning text-dark">Normal</span></td><td><span class="status-badge bg-success text-white">Fulfilled</span></td></tr>
+                <tr><td class="ps-3">#005</td><td>Suresh Raj</td><td><span class="blood-group-badge">A-</span></td><td>1</td><td>Kauvery</td><td>Salem</td><td>22 Mar 2026</td><td><span class="badge bg-warning text-dark">Normal</span></td><td><span class="status-badge bg-secondary text-white">Processing</span></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ======= EMERGENCY SECTION ======= -->
+    <div id="section-emergency" class="tab-section">
+      <div class="alert alert-danger d-flex align-items-center gap-2 mb-4">
+        <i class="bi bi-exclamation-triangle-fill fs-5"></i>
+        <strong>3 emergency requests require immediate attention!</strong>
+      </div>
+      <div class="section-card card">
+        <div class="card-header">
+          <span><i class="bi bi-exclamation-triangle-fill"></i>Emergency Blood Requests</span>
+        </div>
+        <div class="card-body p-0">
+          <div class="table-responsive">
+            <table class="table mb-0 table-hover">
+              <thead>
+                <tr>
+                  <th class="ps-3">#</th>
+                  <th>Patient</th>
+                  <th>Blood Group</th>
+                  <th>Units</th>
+                  <th>Hospital</th>
+                  <th>Contact</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td class="ps-3">1</td>
+                  <td>Arun Vel</td>
+                  <td><span class="blood-group-badge">B+</span></td>
+                  <td>3</td>
+                  <td>Govt Hospital, Madurai</td>
+                  <td>9988776655</td>
+                  <td>
+                    <button class="btn btn-sm btn-success me-1">Approve</button>
+                    <button class="btn btn-sm btn-outline-danger">Reject</button>
+                  </td>
+                </tr>
+                <tr>
+                  <td class="ps-3">2</td>
+                  <td>Priya Sharma</td>
+                  <td><span class="blood-group-badge">O-</span></td>
+                  <td>1</td>
+                  <td>Apollo Hospital, Coimbatore</td>
+                  <td>9123456780</td>
+                  <td>
+                    <button class="btn btn-sm btn-success me-1">Approve</button>
+                    <button class="btn btn-sm btn-outline-danger">Reject</button>
+                  </td>
+                </tr>
+                <tr>
+                  <td class="ps-3">3</td>
+                  <td>Hari Krishnan</td>
+                  <td><span class="blood-group-badge">AB-</span></td>
+                  <td>2</td>
+                  <td>MIOT, Chennai</td>
+                  <td>9900112233</td>
+                  <td>
+                    <button class="btn btn-sm btn-success me-1">Approve</button>
+                    <button class="btn btn-sm btn-outline-danger">Reject</button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ======= CAMPS SECTION ======= -->
+    <div id="section-camps" class="tab-section">
+      <div class="section-card card">
+        <div class="card-header">
+          <span><i class="bi bi-calendar-event-fill"></i>Donation Camps</span>
+          <button class="btn btn-sm btn-danger">+ Add Camp</button>
+        </div>
+        <div class="card-body p-0">
+          <div class="table-responsive">
+            <table class="table mb-0 table-hover">
+              <thead>
+                <tr>
+                  <th class="ps-3">#</th>
+                  <th>Camp Name</th>
+                  <th>Location</th>
+                  <th>Date</th>
+                  <th>Time</th>
+                  <th>Organized By</th>
+                  <th>Status</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td class="ps-3">1</td>
+                  <td>Blood Donation Drive</td>
+                  <td>Chennai City Hospital</td>
+                  <td>25 Mar 2026</td>
+                  <td>9AM - 4PM</td>
+                  <td>LifeLink Blood Bank</td>
+                  <td><span class="status-badge bg-success text-white">Upcoming</span></td>
+                  <td><button class="btn btn-sm btn-outline-danger">Edit</button></td>
+                </tr>
+                <tr>
+                  <td class="ps-3">2</td>
+                  <td>College Camp</td>
+                  <td>Anna University, Chennai</td>
+                  <td>10 Feb 2026</td>
+                  <td>10AM - 3PM</td>
+                  <td>LifeLink + College NSS</td>
+                  <td><span class="status-badge bg-secondary text-white">Completed</span></td>
+                  <td><button class="btn btn-sm btn-outline-danger">Edit</button></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ======= STOCK SECTION ======= -->
+    <div id="section-stock" class="tab-section">
+      <div class="row g-4">
+        <div class="col-12">
+          <div class="section-card card">
+            <div class="card-header">
+              <span><i class="bi bi-archive-fill"></i>Blood Stock Management</span>
+              <button class="btn btn-sm btn-danger">Update Stock</button>
+            </div>
+            <div class="card-body">
+              <div class="table-responsive">
+                <table class="table table-bordered text-center">
+                  <thead class="table-danger">
+                    <tr>
+                      <th>Blood Group</th>
+                      <th>Available Units</th>
+                      <th>Reserved Units</th>
+                      <th>Last Updated</th>
+                      <th>Status</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr><td><span class="blood-group-badge">A+</span></td><td>15</td><td>3</td><td>22 Mar 2026</td><td><span class="status-badge bg-success text-white">Good</span></td></tr>
+                    <tr><td><span class="blood-group-badge">A-</span></td><td>7</td><td>1</td><td>21 Mar 2026</td><td><span class="status-badge bg-warning text-dark">Low</span></td></tr>
+                    <tr><td><span class="blood-group-badge">B+</span></td><td>11</td><td>2</td><td>22 Mar 2026</td><td><span class="status-badge bg-success text-white">Good</span></td></tr>
+                    <tr><td><span class="blood-group-badge">B-</span></td><td>3</td><td>1</td><td>20 Mar 2026</td><td><span class="status-badge bg-danger text-white">Critical</span></td></tr>
+                    <tr><td><span class="blood-group-badge">O+</span></td><td>18</td><td>4</td><td>22 Mar 2026</td><td><span class="status-badge bg-success text-white">Good</span></td></tr>
+                    <tr><td><span class="blood-group-badge">O-</span></td><td>4</td><td>2</td><td>22 Mar 2026</td><td><span class="status-badge bg-danger text-white">Critical</span></td></tr>
+                    <tr><td><span class="blood-group-badge">AB+</span></td><td>6</td><td>1</td><td>21 Mar 2026</td><td><span class="status-badge bg-warning text-dark">Low</span></td></tr>
+                    <tr><td><span class="blood-group-badge">AB-</span></td><td>2</td><td>1</td><td>20 Mar 2026</td><td><span class="status-badge bg-danger text-white">Critical</span></td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ======= CONTACT MESSAGES SECTION ======= -->
+    <div id="section-contact" class="tab-section">
+      <div class="section-card card">
+        <div class="card-header">
+          <span><i class="bi bi-envelope-fill"></i>Contact Messages</span>
+        </div>
+        <div class="card-body p-0">
+          <div class="table-responsive">
+            <table class="table mb-0 table-hover">
+              <thead>
+                <tr>
+                  <th class="ps-3">#</th>
+                  <th>Name</th>
+                  <th>Email</th>
+                  <th>Phone</th>
+                  <th>Message</th>
+                  <th>Date</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td class="ps-3">1</td>
+                  <td>Ramesh S</td>
+                  <td>ramesh@mail.com</td>
+                  <td>9876500001</td>
+                  <td>Need blood urgently for father</td>
+                  <td>22 Mar 2026</td>
+                  <td><button class="btn btn-sm btn-outline-danger">Reply</button></td>
+                </tr>
+                <tr>
+                  <td class="ps-3">2</td>
+                  <td>Lakshmi P</td>
+                  <td>lakshmi@mail.com</td>
+                  <td>9876500002</td>
+                  <td>Interested in donating blood</td>
+                  <td>21 Mar 2026</td>
+                  <td><button class="btn btn-sm btn-outline-danger">Reply</button></td>
+                </tr>
+                <tr>
+                  <td class="ps-3">3</td>
+                  <td>Vinoth K</td>
+                  <td>vinoth@mail.com</td>
+                  <td>9876500003</td>
+                  <td>When is the next camp?</td>
+                  <td>20 Mar 2026</td>
+                  <td><button class="btn btn-sm btn-outline-danger">Reply</button></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- end dashboard-content -->
+</div><!-- end mainContent -->
+
+<!-- ======= LOGOUT CONFIRM OVERLAY ======= -->
+<div class="overlay" id="logoutOverlay">
+  <div class="confirm-box">
+    <div style="font-size:3rem; color:#dc3545; margin-bottom:12px;"><i class="bi bi-box-arrow-right"></i></div>
+    <h5 class="fw-bold mb-2">Confirm Logout</h5>
+    <p class="text-muted mb-4">Are you sure you want to log out from the admin panel?</p>
+    <div class="d-flex gap-3 justify-content-center">
+      <button class="btn btn-outline-secondary px-4" onclick="document.getElementById('logoutOverlay').classList.remove('show')">Cancel</button>
+      <button class="btn btn-danger px-4" onclick="window.location.href='admin-login.html'">Logout</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  const sectionTitles = {
+    'dashboard': 'Dashboard Overview',
+    'donors': 'Registered Donors',
+    'requests': 'Blood Requests',
+    'emergency': 'Emergency Requests',
+    'camps': 'Donation Camps',
+    'stock': 'Blood Stock',
+    'contact': 'Contact Messages'
+  };
+
+  function showSection(name) {
+    // Hide all sections
+    document.querySelectorAll('.tab-section').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.sidebar-link').forEach(l => l.classList.remove('active'));
+
+    // Show selected
+    document.getElementById('section-' + name).classList.add('active');
+    document.getElementById('pageTitle').textContent = sectionTitles[name];
+    document.getElementById('breadcrumbCurrent').textContent = sectionTitles[name];
+
+    // Highlight sidebar
+    event.currentTarget && event.currentTarget.classList.add('active');
+  }
+
+  function toggleSidebar() {
+    document.getElementById('sidebar').classList.toggle('show');
+  }
+</script>
+</body>
+</html>
